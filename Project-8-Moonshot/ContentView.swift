@@ -4,54 +4,42 @@
 //
 //  Created by Luca Capriati on 2022/08/24.
 //
+// Project 8 - Challange 1: Add the launch date to MissionView, below the mission badge. You might choose to format this differently
+//  given that more space is available, but it’s down to you.
+// Project 8 - Challange 2: Extract one or two pieces of view code into their own new SwiftUI views – the horizontal scroll view in
+//  MissionView is a great candidate, but if you followed my styling then you could also move the Rectangle dividers out too.
+// Project 8 - Challange 3: For a tough challenge, add a toolbar item to ContentView that toggles between showing missions as a grid
+//  and as a list.
+// Project 8 - Bonus Challange: Having the app remember which view type the user preffered
 
 import SwiftUI
 
 struct ContentView: View {
+    // Project 8 - Bonus Challange
+    @AppStorage("showingGrid") private var showingGrid = true
+    
     let astronauts: [String: Astronaut] = Bundle.main.decode("astronauts.json")
     let missions: [Mission] = Bundle.main.decode("missions.json")
     
-    // Grid layout. Adaptive is used to make as much use with available space.
-    let columns = [
-        GridItem(.adaptive(minimum: 150))
-    ]
-    
     var body: some View {
         NavigationView {
-            ScrollView {
-                LazyVGrid(columns: columns) {
-                    ForEach(missions) { mission in
-                        NavigationLink {
-                            MissionView(mission: mission, astronauts: astronauts)
-                        } label: {
-                            VStack {
-                                Image(mission.image)
-                                    .resizable()
-                                    .scaledToFit()
-                                    .frame(width: 100, height: 100)
-                                    .padding()
-                                
-                                VStack {
-                                    Text(mission.displayeName)
-                                        .font(.headline)
-                                        .foregroundColor(.white)
-                                    Text(mission.formattedLaunchDate)
-                                        .font(.caption)
-                                        .foregroundColor(.white.opacity(0.5))
-                                }
-                                .padding(.vertical)
-                                .frame(maxWidth: .infinity)
-                                .background(.lightBackground)
-                            }
-                            .clipShape(RoundedRectangle(cornerRadius: 10))
-                            .overlay(
-                                RoundedRectangle(cornerRadius: 10)
-                                    .stroke(.lightBackground)
-                            )
-                        }
+            Group {
+                if showingGrid {
+                    GridLayout(astronauts: astronauts, missions: missions)
+                } else {
+                    ListLayout(astronauts: astronauts, missions: missions)
+                }
+            }
+            .toolbar {
+                Button {
+                    showingGrid.toggle()
+                } label: {
+                    if showingGrid {
+                        Label("Show as table", systemImage: "list.dash")
+                    } else {
+                        Label("Show as grid", systemImage: "square.grid.2x2")
                     }
                 }
-                .padding([.horizontal, .bottom])
             }
             .navigationTitle("Moonshot")
             .background(.darkBackground)

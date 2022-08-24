@@ -19,7 +19,7 @@ struct Mission: Codable, Identifiable {
     let description: String
     
     // variable names to access the appolo mission number from the missions.json file
-    var displayeName: String {
+    var displayName: String {
         "Apollo \(id)"
     }
     
